@@ -880,27 +880,24 @@ def get_events_by_addresses(
     :param int limit: The maximum number of events to return (e.g. 5)
     :param int offset: The number of lines to skip before returning results (overrides the `cursor` parameter)
     """
+    where = [{"address__in": addresses.split(",")}]
+    if event_name:
+        where[0]["event__in"] = event_name.split(",")
     events = select_rows(
         caches.AddressEventsCache().cache_db,
         "address_events",
-        where=[{"address__in": addresses.split(",")}],
+        where=where,
         cursor_field="event_index",
         last_cursor=cursor,
         limit=limit,
         offset=offset,
     )
     events_indexes = [event["event_index"] for event in events.result]
-    where = {"message_index__in": events_indexes}
-    if event_name:
-        where["event__in"] = event_name.split(",")
     result = select_rows(
         ledger_db,
         "messages",
-        where=where,
+        where={"message_index__in": events_indexes},
         cursor_field="event_index",
-        last_cursor=cursor,
-        limit=limit,
-        offset=offset,
         select="message_index AS event_index, event, bindings AS params, tx_hash, block_index",
     )
     return QueryResult(result.result, events.next_cursor, "messages", events.result_count)
