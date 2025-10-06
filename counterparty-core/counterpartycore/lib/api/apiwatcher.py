@@ -235,7 +235,7 @@ def update_address_events(state_db, event, no_cache=False):
             },
         )
         if not no_cache:
-            caches.AddressEventsCache().insert(address, event["message_index"])
+            caches.AddressEventsCache().insert(address, event["event"], event["message_index"])
         if utxosinfo.is_utxo_format(address):
             utxo_address = search_address_from_utxo(state_db, address)
             if utxo_address is not None:
@@ -248,7 +248,9 @@ def update_address_events(state_db, event, no_cache=False):
                     },
                 )
                 if not no_cache:
-                    caches.AddressEventsCache().insert(utxo_address, event["message_index"])
+                    caches.AddressEventsCache().insert(
+                        utxo_address, event["event"], event["message_index"]
+                    )
 
 
 def update_all_expiration(state_db, event):
