@@ -1,3 +1,4 @@
+import pytest
 from counterpartycore.lib import config, ledger
 from counterpartycore.lib.api import apiserver, apiwatcher, composer
 from counterpartycore.lib.api.routes import ALL_ROUTES
@@ -532,3 +533,163 @@ def test_get_balances_by_addresses_pagination(apiv2_client, defaults):
     assert asset_result[0]["asset"] == "XCP"
     assert response_asset.json["next_cursor"] is None
     assert response_asset.json["result_count"] == 1
+
+
+def redirect_to_api_v1():
+    pass
+
+
+def dummy_function():
+    pass
+
+
+@pytest.mark.parametrize(
+    "test_case,method,path,url,rule,route,result,cache_disabled,expected",
+    [
+        (
+            "cache_disabled",
+            "GET",
+            "/v2/blocks",
+            "http://localhost/v2/blocks",
+            "/v2/blocks",
+            {"function": dummy_function},
+            {"data": "test"},
+            True,
+            False,
+        ),
+        (
+            "post_method",
+            "POST",
+            "/v2/blocks",
+            "http://localhost/v2/blocks",
+            "/v2/blocks",
+            {"function": dummy_function},
+            {"data": "test"},
+            False,
+            False,
+        ),
+        (
+            "compose_endpoint",
+            "GET",
+            "/v2/compose/send",
+            "http://localhost/v2/compose/send",
+            "/v2/compose/send",
+            {"function": dummy_function},
+            {"data": "test"},
+            False,
+            False,
+        ),
+        (
+            "mempool_in_rule",
+            "GET",
+            "/v2/mempool",
+            "http://localhost/v2/mempool",
+            "/v2/mempool/",
+            {"function": dummy_function},
+            {"data": "test"},
+            False,
+            False,
+        ),
+        (
+            "healthz_endpoint",
+            "GET",
+            "/healthz",
+            "http://localhost/healthz",
+            "/healthz",
+            {"function": dummy_function},
+            {"data": "test"},
+            False,
+            False,
+        ),
+        (
+            "none_result",
+            "GET",
+            "/v2/blocks",
+            "http://localhost/v2/blocks",
+            "/v2/blocks",
+            {"function": dummy_function},
+            None,
+            False,
+            False,
+        ),
+        (
+            "redirect_to_api_v1",
+            "GET",
+            "/v1/something",
+            "http://localhost/v1/something",
+            "/v1/something",
+            {"function": redirect_to_api_v1},
+            {"data": "test"},
+            False,
+            False,
+        ),
+        (
+            "mempool_path",
+            "GET",
+            "/v2/mempool/transactions",
+            "http://localhost/v2/mempool/transactions",
+            "/v2/mempool/transactions",
+            {"function": dummy_function},
+            {"data": "test"},
+            False,
+            False,
+        ),
+        (
+            "addresses_mempool",
+            "GET",
+            "/v2/addresses/mempool",
+            "http://localhost/v2/addresses/mempool",
+            "/v2/addresses/mempool",
+            {"function": dummy_function},
+            {"data": "test"},
+            False,
+            False,
+        ),
+        (
+            "show_unconfirmed",
+            "GET",
+            "/v2/transactions",
+            "http://localhost/v2/transactions?show_unconfirmed=true",
+            "/v2/transactions",
+            {"function": dummy_function},
+            {"data": "test"},
+            False,
+            False,
+        ),
+        (
+            "valid_case",
+            "GET",
+            "/v2/blocks",
+            "http://localhost/v2/blocks",
+            "/v2/blocks",
+            {"function": dummy_function},
+            {"data": "test"},
+            False,
+            True,
+        ),
+        (
+            "route_none",
+            "GET",
+            "/v2/blocks",
+            "http://localhost/v2/blocks",
+            "/v2/blocks",
+            None,
+            {"data": "test"},
+            False,
+            True,
+        ),
+    ],
+)
+def test_is_cachable(
+    monkeypatch, test_case, method, path, url, rule, route, result, cache_disabled, expected
+):
+    """Test is_cachable with various scenarios"""
+    from unittest.mock import Mock
+
+    monkeypatch.setattr("counterpartycore.lib.config.DISABLE_API_CACHE", cache_disabled)
+
+    mock_request = Mock(method=method, path=path, url=url)
+    monkeypatch.setattr("counterpartycore.lib.api.apiserver.request", mock_request)
+
+    actual = apiserver.is_cachable(rule, route=route, result=result)
+    assert actual == expected, f"Test case '{test_case}' failed"
