@@ -686,8 +686,7 @@ def test_is_cachable(
     """Test is_cachable with various scenarios"""
     from unittest.mock import Mock
 
-    if cache_disabled:
-        monkeypatch.setattr("counterpartycore.lib.config.DISABLE_API_CACHE", True)
+    monkeypatch.setattr("counterpartycore.lib.config.DISABLE_API_CACHE", cache_disabled)
 
     mock_request = Mock(method=method, path=path, url=url)
     monkeypatch.setattr("counterpartycore.lib.api.apiserver.request", mock_request)
