@@ -88,12 +88,22 @@ def api_root():
     }
 
 
-def is_cachable(rule):
+def is_cachable(rule, route=None, result=None):
     if config.DISABLE_API_CACHE or request.method == "POST":
         return False
     for no_cachable in ["/compose/", "/mempool/", "healthz"]:
         if no_cachable in rule:
             return False
+    if result is None:
+        return False
+    if route and route["function"].__name__ == "redirect_to_api_v1":
+        return False
+    if request.path.startswith("/v2/mempool/"):
+        return False
+    if request.path == "/v2/addresses/mempool":
+        return False
+    if "show_unconfirmed=true" in request.url:
+        return False
     return True
 
 
@@ -254,14 +264,7 @@ def execute_api_function(rule, route, function_args):
         else:
             result = route["function"](**function_args)
         # don't cache API v1 and mempool queries
-        if (
-            result is not None
-            and is_cachable(rule)
-            and route["function"].__name__ != "redirect_to_api_v1"
-            and not request.path.startswith("/v2/mempool/")
-            and request.path != "/v2/addresses/mempool"
-            and "show_unconfirmed=true" not in request.url
-        ):
+        if is_cachable(rule, route, result):
             sentry_put_span.set_data("cache.key", cache_key)
             BLOCK_CACHE[cache_key] = result
             if len(BLOCK_CACHE) > MAX_BLOCK_CACHE_SIZE:
