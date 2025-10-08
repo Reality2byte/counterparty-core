@@ -32,6 +32,7 @@ counterparty-server start
 ## Bugfixes
 
 - Fix get events by addresses endpoint
+- Exclude /v2/addresses/mempool from cache
 
 ## Codebase
 
