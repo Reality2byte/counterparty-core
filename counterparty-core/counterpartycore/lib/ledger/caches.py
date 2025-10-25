@@ -63,7 +63,7 @@ class AssetCache(metaclass=helpers.SingletonMeta):
         if issuance["asset_longname"] is not None:
             self.assets[issuance["asset_longname"]] = issuance
         self.assets[issuance["asset"]] = issuance
-        if issuance["quantity"] is not None:
+        if issuance["status"] == "valid" and issuance["quantity"] is not None:
             if issuance["asset"] in self.assets_total_issued:
                 self.assets_total_issued[issuance["asset"]] += issuance["quantity"]
             else:
@@ -72,7 +72,7 @@ class AssetCache(metaclass=helpers.SingletonMeta):
     def add_destroyed(self, destroyed):
         if "rowid" in destroyed:
             del destroyed["rowid"]
-        if destroyed["quantity"] is not None:
+        if destroyed["status"] == "valid" and destroyed["quantity"] is not None:
             if destroyed["asset"] in self.assets_total_destroyed:
                 self.assets_total_destroyed[destroyed["asset"]] += destroyed["quantity"]
             else:
