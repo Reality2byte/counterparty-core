@@ -60,14 +60,15 @@ class AssetCache(metaclass=helpers.SingletonMeta):
     def add_issuance(self, issuance):
         if "rowid" in issuance:
             del issuance["rowid"]
-        if issuance["asset_longname"] is not None:
-            self.assets[issuance["asset_longname"]] = issuance
-        self.assets[issuance["asset"]] = issuance
-        if issuance["status"] == "valid" and issuance["quantity"] is not None:
-            if issuance["asset"] in self.assets_total_issued:
-                self.assets_total_issued[issuance["asset"]] += issuance["quantity"]
-            else:
-                self.assets_total_issued[issuance["asset"]] = issuance["quantity"]
+        if issuance["status"] == "valid":
+            if issuance["asset_longname"] is not None:
+                self.assets[issuance["asset_longname"]] = issuance
+            self.assets[issuance["asset"]] = issuance
+            if issuance["quantity"] is not None:
+                if issuance["asset"] in self.assets_total_issued:
+                    self.assets_total_issued[issuance["asset"]] += issuance["quantity"]
+                else:
+                    self.assets_total_issued[issuance["asset"]] = issuance["quantity"]
 
     def add_destroyed(self, destroyed):
         if "rowid" in destroyed:
