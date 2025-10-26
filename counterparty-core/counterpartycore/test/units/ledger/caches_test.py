@@ -17,6 +17,7 @@ def test_asset_cache(ledger_db, defaults):
             "asset": "foobar",
             "asset_longname": "longfoobar",
             "quantity": 1000,
+            "status": "valid",
         }
     )
     assert caches.AssetCache().assets_total_issued["foobar"] == 1000
@@ -26,6 +27,17 @@ def test_asset_cache(ledger_db, defaults):
             "asset": "foobar",
             "asset_longname": "longfoobar",
             "quantity": 1000,
+            "status": "valid",
+        }
+    )
+    assert caches.AssetCache().assets_total_issued["foobar"] == 2000
+
+    caches.AssetCache().add_issuance(
+        {
+            "asset": "foobar",
+            "asset_longname": "longfoobar",
+            "quantity": 500,
+            "status": "invalid",
         }
     )
     assert caches.AssetCache().assets_total_issued["foobar"] == 2000
@@ -37,6 +49,17 @@ def test_asset_cache(ledger_db, defaults):
             "asset": "foobar",
             "asset_longname": "longfoobar",
             "quantity": 500,
+            "status": "valid",
+        }
+    )
+    assert caches.AssetCache().assets_total_destroyed["foobar"] == 1500
+
+    caches.AssetCache().add_destroyed(
+        {
+            "asset": "foobar",
+            "asset_longname": "longfoobar",
+            "quantity": 300,
+            "status": "invalid",
         }
     )
     assert caches.AssetCache().assets_total_destroyed["foobar"] == 1500
@@ -47,6 +70,7 @@ def test_asset_cache(ledger_db, defaults):
             "asset": "foobaz",
             "asset_longname": "longfoobar",
             "quantity": 500,
+            "status": "valid",
         }
     )
     assert caches.AssetCache().assets_total_destroyed["foobaz"] == 500

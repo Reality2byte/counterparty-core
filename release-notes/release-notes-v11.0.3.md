@@ -33,6 +33,7 @@ counterparty-server start
 
 - Fix get events by addresses endpoint
 - Exclude /v2/addresses/mempool from cache
+- Don't cache invalid issuances
 
 ## Codebase
 
