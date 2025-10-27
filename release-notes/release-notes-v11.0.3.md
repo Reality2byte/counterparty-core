@@ -1,4 +1,4 @@
-# Release Notes - Counterparty Core v11.0.3 (2025-10-26)
+# Release Notes - Counterparty Core v11.0.3 (2025-10-27)
 
 This is a minor release that addresses three bugs in Counterparty Core: one in the caching of issuance transactions which can lead to mismatches in consensus hashes across nodes, and two bugs in the API (including another one also related to caching). All users should upgrade as soon as possible.
 
@@ -6,7 +6,7 @@ This is a minor release that addresses three bugs in Counterparty Core: one in t
 
 **Upgrade Instructions:**
 
-To upgrade, download the latest version of `counterparty-core` and restart `counterparty-server`. An rollback to block 911,955 to correct the transaction cache will occur automatically.
+To upgrade, download the latest version of `counterparty-core` and restart `counterparty-server`. An reparse to block 911,955 to correct the transaction cache will occur automatically.
 
 With Docker Compose:
 
