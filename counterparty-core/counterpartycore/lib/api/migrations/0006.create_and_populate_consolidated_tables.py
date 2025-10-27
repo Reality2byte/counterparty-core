@@ -43,16 +43,19 @@ POST_QUERIES = {
                 SELECT SUM(earn_quantity) 
                 FROM fairmints 
                 WHERE fairmints.fairminter_tx_hash = fairminters.tx_hash
+                AND fairmints.status = 'valid'
             ),
             paid_quantity = (
                 SELECT SUM(paid_quantity) 
                 FROM fairmints 
                 WHERE fairmints.fairminter_tx_hash = fairminters.tx_hash
+                AND fairmints.status = 'valid'
             ),
             commission = (
                 SELECT SUM(commission) 
                 FROM fairmints 
                 WHERE fairmints.fairminter_tx_hash = fairminters.tx_hash
+                AND fairmints.status = 'valid'
             );
         """,
     ],
